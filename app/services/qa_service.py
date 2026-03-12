@@ -1,10 +1,12 @@
-"""ONNX-based extractive question answering using deepset/roberta-base-squad2."""
+"""ONNX-based extractive question answering using optimum/roberta-base-squad2."""
 
 from dataclasses import dataclass
 
 import numpy as np
 import onnxruntime as ort
 from transformers import AutoTokenizer
+
+from app.services.embedding_service import _find_onnx_model
 
 
 @dataclass
@@ -34,7 +36,7 @@ class QAService:
         """
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
         self.session = ort.InferenceSession(
-            f"{model_path}/model.onnx",
+            _find_onnx_model(model_path),
             providers=["CPUExecutionProvider"],
         )
 

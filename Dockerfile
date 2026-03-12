@@ -1,23 +1,23 @@
-# Stage 1: Export HuggingFace models to ONNX format
-# This stage requires PyTorch and transformers — heavy but temporary
+# Stage 1: Download pre-exported ONNX models from HuggingFace Hub
 FROM python:3.11-slim AS model-builder
+WORKDIR /models
+RUN pip install --no-cache-dir huggingface-hub
 
-WORKDIR /export
+RUN python -c "\
+from huggingface_hub import snapshot_download; \
+snapshot_download( \
+    'sentence-transformers/all-MiniLM-L6-v2', \
+    local_dir='/models/embedding', \
+    allow_patterns=['onnx/*', 'tokenizer*', 'special_tokens*', 'vocab*', 'config.json', 'sentence*'], \
+)"
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential && rm -rf /var/lib/apt/lists/*
-
-RUN pip install --no-cache-dir \
-    torch==2.6.0+cpu \
-    --index-url https://download.pytorch.org/whl/cpu
-
-RUN pip install --no-cache-dir \
-    transformers==4.49.0 \
-    optimum[exporters]==1.24.0 \
-    onnxruntime==1.21.0
-
-COPY scripts/export_models.py .
-RUN python export_models.py --output-dir /models
+RUN python -c "\
+from huggingface_hub import snapshot_download; \
+snapshot_download( \
+    'optimum/roberta-base-squad2', \
+    local_dir='/models/qa', \
+    allow_patterns=['model.onnx', 'tokenizer*', 'special_tokens*', 'vocab*', 'config.json', 'merges*'], \
+)"
 
 
 # Stage 2: Lean runtime — no PyTorch, only ONNX Runtime
@@ -43,5 +43,4 @@ RUN mkdir -p /app/data /app/uploads
 
 EXPOSE 5000
 
-# Use gunicorn for production
 CMD ["python", "-m", "flask", "--app", "app", "run", "--host", "0.0.0.0", "--port", "5000"]

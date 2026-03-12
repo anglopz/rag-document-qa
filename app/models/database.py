@@ -104,11 +104,16 @@ def create_document(
 
     db.commit()
 
+    created_at = db.execute(
+        "SELECT created_at FROM documents WHERE id = ?", (doc_id,)
+    ).fetchone()[0]
+
     return {
         "id": doc_id,
         "filename": filename,
         "content_type": content_type,
         "num_chunks": len(chunks),
+        "created_at": created_at,
     }
 
 

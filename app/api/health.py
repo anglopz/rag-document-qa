@@ -1,9 +1,9 @@
 """Health check endpoint."""
 
-import os
-
 from flask import current_app
 from flask_restx import Namespace, Resource, fields
+
+from app.services.embedding_service import _find_onnx_model
 
 
 def create_health_ns() -> Namespace:
@@ -26,13 +26,12 @@ def create_health_ns() -> Namespace:
         @ns.marshal_with(health_model)
         def get(self):
             """Check service health and model availability."""
-            embedding_path = current_app.config["EMBEDDING_MODEL_PATH"]
-            qa_path = current_app.config["QA_MODEL_PATH"]
-
-            models_loaded = (
-                os.path.isfile(os.path.join(embedding_path, "model.onnx"))
-                and os.path.isfile(os.path.join(qa_path, "model.onnx"))
-            )
+            try:
+                _find_onnx_model(current_app.config["EMBEDDING_MODEL_PATH"])
+                _find_onnx_model(current_app.config["QA_MODEL_PATH"])
+                models_loaded = True
+            except FileNotFoundError:
+                models_loaded = False
 
             return {
                 "status": "healthy",

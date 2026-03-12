@@ -1,8 +1,24 @@
 """ONNX-based embedding service using all-MiniLM-L6-v2."""
 
+import os
+
 import numpy as np
 import onnxruntime as ort
 from transformers import AutoTokenizer
+
+
+def _find_onnx_model(model_path: str) -> str:
+    """Locate model.onnx, checking both root and onnx/ subdirectory."""
+    candidates = [
+        os.path.join(model_path, "model.onnx"),
+        os.path.join(model_path, "onnx", "model.onnx"),
+    ]
+    for path in candidates:
+        if os.path.isfile(path):
+            return path
+    raise FileNotFoundError(
+        f"No model.onnx found in {model_path} or {model_path}/onnx/"
+    )
 
 
 class EmbeddingService:
@@ -21,7 +37,7 @@ class EmbeddingService:
         """
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
         self.session = ort.InferenceSession(
-            f"{model_path}/model.onnx",
+            _find_onnx_model(model_path),
             providers=["CPUExecutionProvider"],
         )
 
