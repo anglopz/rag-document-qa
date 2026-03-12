@@ -78,20 +78,6 @@ docker-compose up --build
 
 The service will be available at `http://localhost:5000`. Swagger UI documentation is at `http://localhost:5000/docs`.
 
-### Without Docker
-
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Export ONNX models (requires torch + optimum, one-time setup)
-pip install torch transformers optimum[exporters]
-python scripts/export_models.py
-
-# Run the service
-flask --app app run --host 0.0.0.0 --port 5000
-```
-
 ## API Reference
 
 Full interactive documentation is available at `/docs` (Swagger UI) when the service is running.
@@ -220,8 +206,6 @@ rag-document-qa/
 │       ├── questions.py         # Question endpoint
 │       └── health.py            # Health check
 ├── tests/                       # pytest test suite
-├── scripts/
-│   └── export_models.py         # ONNX model export
 ├── Dockerfile                   # Multi-stage build
 ├── docker-compose.yml
 └── requirements.txt
@@ -234,7 +218,7 @@ rag-document-qa/
 | Web Framework | Flask + flask-restx | REST API with auto-generated Swagger docs |
 | Database | SQLite3 | Document and embedding storage |
 | Embeddings | all-MiniLM-L6-v2 | Sentence embeddings (384 dimensions) |
-| QA Model | deepset/roberta-base-squad2 | Extractive question answering |
+| QA Model | optimum/roberta-base-squad2 (deepset/roberta-base-squad2 weights) | Extractive question answering |
 | Inference | ONNX Runtime | Production-optimized model inference |
 | Document Parsing | PyPDF2, python-docx | PDF and DOCX text extraction |
 | Testing | pytest | Unit and integration tests |
