@@ -26,7 +26,9 @@ def create_app(config=None):
         app.config.from_object(config)
 
     # Ensure required directories exist
-    os.makedirs(os.path.dirname(app.config["DATABASE_PATH"]), exist_ok=True)
+    db_dir = os.path.dirname(app.config["DATABASE_PATH"])
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
     # Initialize database
