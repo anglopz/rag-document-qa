@@ -1,0 +1,18 @@
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - app-data:/app/data
+      - app-uploads:/app/uploads
+    environment:
+      - DATABASE_PATH=/app/data/rag.db
+      - UPLOAD_FOLDER=/app/uploads
+      - EMBEDDING_MODEL_PATH=/app/models/embedding
+      - QA_MODEL_PATH=/app/models/qa
+      - FLASK_ENV=production
+
+volumes:
+  app-data:
+  app-uploads:
