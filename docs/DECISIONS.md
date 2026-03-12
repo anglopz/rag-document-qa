@@ -22,8 +22,10 @@ These dependencies create a fragile build that breaks across version combination
 ### Decision
 
 Download pre-exported ONNX models directly from HuggingFace Hub using
-`huggingface-cli download`. Both `sentence-transformers/all-MiniLM-L6-v2` and
-`deepset/roberta-base-squad2` have pre-exported ONNX variants available on the Hub.
+`huggingface-cli download`. `sentence-transformers/all-MiniLM-L6-v2` has pre-exported ONNX files on the Hub.
+`deepset/roberta-base-squad2` does not ship ONNX exports, so we use
+`optimum/roberta-base-squad2` — the same model weights pre-exported by the
+HuggingFace Optimum team.
 
 The Docker build remains multi-stage:
 - **Stage 1:** Downloads ONNX model files and tokenizer configs (only needs
